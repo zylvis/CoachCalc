@@ -1,4 +1,7 @@
+using CoachCalcAPI;
 using CoachCalcAPI.Data;
+using CoachCalcAPI.Repository;
+using CoachCalcAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +20,9 @@ builder.Services.AddCors(options =>
                       });
 });
 
-
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
