@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CoachCalcAPI.Models
+namespace CoachCalcAPI.Models.Dto
 {
-    public class Exercise
+    public class ResultUpdateDTO
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string MetricType  { get; set; }
+        public string Value { get; set; }
+        public DateTime Date { get; set; }
     }
 }

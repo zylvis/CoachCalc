@@ -6,24 +6,24 @@ using System.Linq.Expressions;
 
 namespace CoachCalcAPI.Repository
 {
-    public class AthleteeRepository : IAthleteeRepository
+    public class ResultRepository: IResultRepository
     {
         private readonly ApplicationDbContext _db;
 
-        public AthleteeRepository(ApplicationDbContext db)
+        public ResultRepository(ApplicationDbContext db)
         {
             _db = db;
         }
-
-        public async Task CreateAsync(Athletee entity)
+        public async Task CreateAsync(Result entity)
         {
-            await _db.Athletees.AddAsync(entity);
+
+            await _db.Results.AddAsync(entity);
             await SaveAsync();
         }
 
-        public async Task<List<Athletee>> GetAllAsync(Expression<Func<Athletee, bool>>? filter = null)
+        public async Task<List<Result>> GetAllAsync(Expression<Func<Result, bool>>? filter = null)
         {
-            IQueryable<Athletee> query = _db.Athletees;
+            IQueryable<Result> query = _db.Results;
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -31,9 +31,9 @@ namespace CoachCalcAPI.Repository
             return await query.ToListAsync();
         }
 
-        public async Task<Athletee> GetAsync(Expression<Func<Athletee, bool>> filter = null, bool tracked = true)
+        public async Task<Result> GetAsync(Expression<Func<Result, bool>> filter = null, bool tracked = true)
         {
-            IQueryable<Athletee> query = _db.Athletees;
+            IQueryable<Result> query = _db.Results;
             if (!tracked)
             {
                 query = query.AsNoTracking();
@@ -45,9 +45,9 @@ namespace CoachCalcAPI.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task RemoveAsync(Athletee entity)
+        public async Task RemoveAsync(Result entity)
         {
-            _db.Athletees.Remove(entity);
+            _db.Results.Remove(entity);
             await SaveAsync();
         }
 
@@ -56,9 +56,9 @@ namespace CoachCalcAPI.Repository
             await _db.SaveChangesAsync();
         }
 
-        public async Task<Athletee> UpdateAsync(Athletee entity)
+        public async Task<Result> UpdateAsync(Result entity)
         {
-            _db.Athletees.Update(entity);
+            _db.Results.Update(entity);
             await _db.SaveChangesAsync();
             return entity;
         }

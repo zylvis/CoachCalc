@@ -2,6 +2,7 @@
 using CoachCalcAPI.Models;
 using CoachCalcAPI.Models.Dto;
 using CoachCalcAPI.Repository.IRepository;
+using CoachCalcAPI.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -17,9 +18,9 @@ namespace CoachCalcAPI.Controllers
         private readonly IExerciseRepository _dbExercise;
         private readonly IMapper _mapper;
 
-        public ExerciseController(IExerciseRepository dbBook, ILogger<ExerciseController> logger, IMapper mapper)
+        public ExerciseController(IExerciseRepository dbExercise, ILogger<ExerciseController> logger, IMapper mapper)
         {
-            _dbExercise = dbBook;
+            _dbExercise = dbExercise;
             _logger = logger;
             _mapper = mapper;
             this._response = new();
@@ -31,9 +32,9 @@ namespace CoachCalcAPI.Controllers
         {
             try
             {
-                _logger.LogInformation("Getting All books");
-                IEnumerable<Exercise> bookList = await _dbExercise.GetAllAsync();
-                _response.Result = _mapper.Map<List<ExerciseDTO>>(bookList);
+                _logger.LogInformation("Getting All exercises");
+                IEnumerable<Exercise> exerciseList = await _dbExercise.GetAllAsync();
+                _response.Result = _mapper.Map<List<ExerciseDTO>>(exerciseList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -90,7 +91,12 @@ namespace CoachCalcAPI.Controllers
             {
                 if (await _dbExercise.GetAsync(x => x.Name.ToLower() == createDTO.Name.ToLower()) != null)
                 {
-                    ModelState.AddModelError("", "Exercise already Exists!");
+                    ModelState.AddModelError("Message", "Exercise already Exists!");
+                    return BadRequest(ModelState);
+                }
+                if (createDTO.MetricType != MetricTypes.Number && createDTO.MetricType != MetricTypes.Time)
+                {
+                    ModelState.AddModelError("Message", "Metric type is not of acceptbles strings: 'Number' or 'Time'");
                     return BadRequest(ModelState);
                 }
                 if (createDTO == null)

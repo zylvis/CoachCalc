@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CoachCalcAPI.Models
+namespace CoachCalcAPI.Models.Dto
 {
-    public class Athletee
+    public class AthleteeCreateDTO
     {
-
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        [Required]
         public string? FirstName { get; set; }
+        [Required]
         public string? LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public string? Image { get; set; }
-
     }
 }

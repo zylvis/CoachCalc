@@ -6,5 +6,7 @@ namespace CoachCalcAPI.Models.Dto
     {
         [Required]
         public string Name { get; set; }
+        [Required]
+        public string MetricType { get; set; }
     }
 }

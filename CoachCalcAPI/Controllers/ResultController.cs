@@ -1,32 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using CoachCalcAPI.Models;
+using CoachCalcAPI.Models.Dto;
+using CoachCalcAPI.Repository.IRepository;
+using CoachCalcAPI.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CoachCalcAPI.Data;
-using CoachCalcAPI.Models;
-using Microsoft.AspNetCore.Cors;
-using CoachCalcAPI.Repository.IRepository;
-using AutoMapper;
 using System.Net;
-using CoachCalcAPI.Models.Dto;
 
 namespace CoachCalcAPI.Controllers
 {
-    [Route("api/Athletee")]
+    [Route("api/Result")]
     [ApiController]
-    public class AthleteeController : ControllerBase
+    public class ResultController : ControllerBase
     {
         protected APIResponse _response;
-        private ILogger<AthleteeController> _logger;
-        private readonly IAthleteeRepository _dbAthletee;
+        private ILogger<ResultController> _logger;
+        private readonly IResultRepository _dbResult;
         private readonly IMapper _mapper;
 
-        public AthleteeController(IAthleteeRepository dbAthletee, ILogger<AthleteeController> logger, IMapper mapper)
+        public ResultController(IResultRepository dbResult, ILogger<ResultController> logger, IMapper mapper)
         {
-            _dbAthletee = dbAthletee;
+            _dbResult = dbResult;
             _logger = logger;
             _mapper = mapper;
             this._response = new();
@@ -34,13 +28,13 @@ namespace CoachCalcAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAthleteess()
+        public async Task<ActionResult<APIResponse>> GetResults()
         {
             try
             {
-                _logger.LogInformation("Getting All Athletees");
-                IEnumerable<Athletee> athleteeList = await _dbAthletee.GetAllAsync();
-                _response.Result = _mapper.Map<List<AthleteeDTO>>(athleteeList);
+                _logger.LogInformation("Getting All books");
+                IEnumerable<Result> bookList = await _dbResult.GetAllAsync();
+                _response.Result = _mapper.Map<List<ResultDTO>>(bookList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -53,29 +47,29 @@ namespace CoachCalcAPI.Controllers
         }
 
 
-        [HttpGet("{id:int}", Name = "GetAthletee")]
+        [HttpGet("{id:int}", Name = "GetResult")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetAthletee(int id)
+        public async Task<ActionResult<APIResponse>> GetResult(int id)
         {
             try
             {
                 if (id == 0)
                 {
-                    _logger.LogInformation("Get Athletee error with Id: " + id);
+                    _logger.LogInformation("Get Result error with Id: " + id);
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var athletee = await _dbAthletee.GetAsync(x => x.Id == id);
+                var result = await _dbResult.GetAsync(x => x.Id == id);
 
-                if (athletee == null)
+                if (result == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                _response.Result = _mapper.Map<AthleteeDTO>(athletee);
+                _response.Result = _mapper.Map<ResultDTO>(result);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -91,21 +85,28 @@ namespace CoachCalcAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> CreateAthletee([FromBody] AthleteeCreateDTO createDTO)
+        public async Task<ActionResult<APIResponse>> CreateResult([FromBody] ResultCreateDTO createDTO)
         {
             try
             {
+                if (await _dbResult.GetAsync(x => x.Date == createDTO.Date && x.AthleteeId == createDTO.AthleteeId &&
+                                            x.Value == createDTO.Value) != null)
+                {
+                    ModelState.AddModelError("Message", "Exercise already Exists!");
+                    return BadRequest(ModelState);
+                }
+
                 if (createDTO == null)
                 {
                     return BadRequest(createDTO);
                 }
 
-                Athletee athletee = _mapper.Map<Athletee>(createDTO);
+                Result result = _mapper.Map<Result>(createDTO);
 
-                await _dbAthletee.CreateAsync(athletee);
-                _response.Result = _mapper.Map<AthleteeDTO>(athletee);
+                await _dbResult.CreateAsync(result);
+                _response.Result = _mapper.Map<ResultDTO>(result);
                 _response.StatusCode = HttpStatusCode.Created;
-                return CreatedAtRoute("GetAthletee", new { id = athletee.Id }, _response);
+                return CreatedAtRoute("GetResult", new { id = result.Id }, _response);
             }
             catch (Exception ex)
             {
@@ -118,8 +119,8 @@ namespace CoachCalcAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("{id:int}", Name = "DeleteAthletee")]
-        public async Task<ActionResult<APIResponse>> DeleteAthletee(int id)
+        [HttpDelete("{id:int}", Name = "DeleteResult")]
+        public async Task<ActionResult<APIResponse>> DeleteResult(int id)
         {
             try
             {
@@ -128,14 +129,14 @@ namespace CoachCalcAPI.Controllers
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var athletee = await _dbAthletee.GetAsync(x => x.Id == id);
-                if (athletee == null)
+                var result = await _dbResult.GetAsync(x => x.Id == id);
+                if (result == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                await _dbAthletee.RemoveAsync(athletee);
+                await _dbResult.RemoveAsync(result);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);
@@ -150,8 +151,8 @@ namespace CoachCalcAPI.Controllers
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPut("{id:int}", Name = "UpdateAthletee")]
-        public async Task<ActionResult<APIResponse>> UpdateAthletee(int id, [FromBody] AthleteeUpdateDTO updateDTO)
+        [HttpPut("{id:int}", Name = "UpdateResult")]
+        public async Task<ActionResult<APIResponse>> UpdateResult(int id, [FromBody] ResultUpdateDTO updateDTO)
         {
             try
             {
@@ -161,9 +162,9 @@ namespace CoachCalcAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                Athletee model = _mapper.Map<Athletee>(updateDTO);
+                Result model = _mapper.Map<Result>(updateDTO);
 
-                await _dbAthletee.UpdateAsync(model);
+                await _dbResult.UpdateAsync(model);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);

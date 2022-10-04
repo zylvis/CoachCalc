@@ -12,5 +12,6 @@ namespace CoachCalcAPI.Data
 
         public DbSet<Athletee> Athletees { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<Result> Results { get; set; }
     }
 }
