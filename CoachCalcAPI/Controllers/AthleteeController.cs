@@ -12,6 +12,7 @@ using CoachCalcAPI.Repository.IRepository;
 using AutoMapper;
 using System.Net;
 using CoachCalcAPI.Models.Dto;
+using CoachCalcAPI.Repository;
 
 namespace CoachCalcAPI.Controllers
 {

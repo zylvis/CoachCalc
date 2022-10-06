@@ -9,7 +9,7 @@ namespace CoachCalcAPI.Models.Dto
         public string? FirstName { get; set; }
         [Required]
         public string? LastName { get; set; }
-        public DateTime BirthDate { get; set; }
+        public string BirthDate { get; set; }
         public string? Image { get; set; }
     }
 }
