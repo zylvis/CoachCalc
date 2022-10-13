@@ -9,6 +9,6 @@ namespace CoachCalcAPI.Models.Dto
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Value { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
     }
 }

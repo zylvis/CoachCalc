@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using CoachCalcAPI.Data;
 using CoachCalcAPI.Models;
 using CoachCalcAPI.Models.Dto;
 using CoachCalcAPI.Repository.IRepository;
 using CoachCalcAPI.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace CoachCalcAPI.Controllers
@@ -17,13 +19,15 @@ namespace CoachCalcAPI.Controllers
         private ILogger<ResultController> _logger;
         private readonly IResultRepository _dbResult;
         private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _db;
 
-        public ResultController(IResultRepository dbResult, ILogger<ResultController> logger, IMapper mapper)
+        public ResultController(IResultRepository dbResult, ILogger<ResultController> logger, IMapper mapper, ApplicationDbContext db)
         {
             _dbResult = dbResult;
             _logger = logger;
             _mapper = mapper;
             this._response = new();
+            _db = db;
         }
 
         [HttpGet]
@@ -33,8 +37,16 @@ namespace CoachCalcAPI.Controllers
             try
             {
                 _logger.LogInformation("Getting All books");
-                IEnumerable<Result> bookList = await _dbResult.GetAllAsync();
-                _response.Result = _mapper.Map<List<ResultDTO>>(bookList);
+                IEnumerable<Result> resultList = await _dbResult.GetAllAsync();
+                IEnumerable<Exercise> exercisesList = await _db.Exercises.ToListAsync();
+
+                var query = (from b in resultList
+                             join u in exercisesList
+                                 on b.ExerciseId equals u.Id
+                             select new { b.Id, b.AthleteeId, b.ExerciseId, b.Value, b.Date, u.Name, u.MetricType }).ToList();
+                _response.Result = query.OrderByDescending(x => x.Date);
+
+                //_response.Result = _mapper.Map<List<ResultDTO>>(resultList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -90,9 +102,9 @@ namespace CoachCalcAPI.Controllers
             try
             {
                 if (await _dbResult.GetAsync(x => x.Date == createDTO.Date && x.AthleteeId == createDTO.AthleteeId &&
-                                            x.Value == createDTO.Value) != null)
+                                            x.ExerciseId == createDTO.ExerciseId) != null)
                 {
-                    ModelState.AddModelError("Message", "Exercise already Exists!");
+                    ModelState.AddModelError("Message", $"Result of the exercise on {createDTO.Date} already exists!");
                     return BadRequest(ModelState);
                 }
 

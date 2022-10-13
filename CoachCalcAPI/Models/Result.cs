@@ -17,8 +17,7 @@ namespace CoachCalcAPI.Models
         public int ExerciseId { get; set; }
         public Exercise Exercise { get; set; }
         public string Value { get; set; }
-        public DateTime TimeValue { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
 
     }
 }
