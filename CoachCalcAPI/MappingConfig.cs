@@ -19,6 +19,10 @@ namespace CoachCalcAPI
             CreateMap<Result, ResultDTO>().ReverseMap();
             CreateMap<Result, ResultCreateDTO>().ReverseMap();
             CreateMap<Result, ResultUpdateDTO>().ReverseMap();
+
+
+            CreateMap<ApplicationUser, UserDTO>().ReverseMap();
         }
     }
+    
 }
