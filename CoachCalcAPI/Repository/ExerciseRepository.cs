@@ -3,20 +3,23 @@ using CoachCalcAPI.Models;
 using CoachCalcAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace CoachCalcAPI.Repository
 {
     public class ExerciseRepository : IExerciseRepository
     {
         private readonly ApplicationDbContext _db;
-
-        public ExerciseRepository(ApplicationDbContext db)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ExerciseRepository(ApplicationDbContext db, IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task CreateAsync(Exercise entity)
         {
-            
+            string userId = _httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            entity.UserId = userId;
             await _db.Exercises.AddAsync(entity);
             await SaveAsync();
         }
@@ -58,6 +61,8 @@ namespace CoachCalcAPI.Repository
 
         public async Task<Exercise> UpdateAsync(Exercise entity)
         {
+            string userId = _httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            entity.UserId = userId;
             _db.Exercises.Update(entity);
             await _db.SaveChangesAsync();
             return entity;

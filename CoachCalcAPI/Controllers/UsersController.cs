@@ -38,7 +38,7 @@ namespace CoachCalcAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterationRequestDTO model)
         {
-            bool ifUserNameUnique = _userRepo.IsUniqueUser(model.UserName);
+            bool ifUserNameUnique = _userRepo.IsUniqueUser(model.Email);
             if (!ifUserNameUnique)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;

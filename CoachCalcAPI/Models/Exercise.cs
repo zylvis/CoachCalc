@@ -8,7 +8,12 @@ namespace CoachCalcAPI.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        [ForeignKey("ApplicationUser")]
+        public string UserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public string Name { get; set; }
+
         public string MetricType  { get; set; }
+
     }
 }

@@ -12,10 +12,7 @@ namespace CoachCalcAPI.Models
         [ForeignKey("Athletee")]
         public int AthleteeId { get; set; }
         public Athletee Athletee { get; set; }
-
-        [ForeignKey("Exercise")]
         public int ExerciseId { get; set; }
-        public Exercise Exercise { get; set; }
         public string Value { get; set; }
         public string Date { get; set; }
 

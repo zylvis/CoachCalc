@@ -13,24 +13,29 @@ using AutoMapper;
 using System.Net;
 using CoachCalcAPI.Models.Dto;
 using CoachCalcAPI.Repository;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace CoachCalcAPI.Controllers
 {
     [Route("api/Athletee")]
     [ApiController]
+    [Authorize(Roles = "admin, customer")]
     public class AthleteeController : ControllerBase
     {
         protected APIResponse _response;
         private ILogger<AthleteeController> _logger;
         private readonly IAthleteeRepository _dbAthletee;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AthleteeController(IAthleteeRepository dbAthletee, ILogger<AthleteeController> logger, IMapper mapper)
+        public AthleteeController(IAthleteeRepository dbAthletee, ILogger<AthleteeController> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _dbAthletee = dbAthletee;
             _logger = logger;
             _mapper = mapper;
             this._response = new();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -40,7 +45,8 @@ namespace CoachCalcAPI.Controllers
             try
             {
                 _logger.LogInformation("Getting All Athletees");
-                IEnumerable<Athletee> athleteeList = await _dbAthletee.GetAllAsync();
+                string userId = _httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                IEnumerable<Athletee> athleteeList = await _dbAthletee.GetAllAsync(x => x.UserId == userId);
                 _response.Result = _mapper.Map<List<AthleteeDTO>>(athleteeList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CoachCalcAPI.Models.Dto
+namespace CoachCalcAPI.Models
 {
     public class ResultUpdateDTO
     {

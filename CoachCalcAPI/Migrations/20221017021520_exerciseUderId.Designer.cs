@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachCalcAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221013232518_moderlUser")]
-    partial class moderlUser
+    [Migration("20221017021520_exerciseUderId")]
+    partial class exerciseUderId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,7 +50,6 @@ namespace CoachCalcAPI.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -114,7 +113,13 @@ namespace CoachCalcAPI.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Athletees");
                 });
@@ -135,7 +140,13 @@ namespace CoachCalcAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Exercises");
                 });
@@ -165,8 +176,6 @@ namespace CoachCalcAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AthleteeId");
-
-                    b.HasIndex("ExerciseId");
 
                     b.ToTable("Results");
                 });
@@ -304,6 +313,28 @@ namespace CoachCalcAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CoachCalcAPI.Models.Athletee", b =>
+                {
+                    b.HasOne("CoachCalcAPI.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("CoachCalcAPI.Models.Exercise", b =>
+                {
+                    b.HasOne("CoachCalcAPI.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("CoachCalcAPI.Models.Result", b =>
                 {
                     b.HasOne("CoachCalcAPI.Models.Athletee", "Athletee")
@@ -312,15 +343,7 @@ namespace CoachCalcAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachCalcAPI.Models.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Athletee");
-
-                    b.Navigation("Exercise");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

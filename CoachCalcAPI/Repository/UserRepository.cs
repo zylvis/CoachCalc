@@ -43,7 +43,7 @@ namespace CoachCalcAPI.Repository
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
             var user = _db.ApplicationUsers
-                .FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
+                .FirstOrDefault(u => u.Email.ToLower() == loginRequestDTO.Email.ToLower());
 
             bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
 
@@ -66,11 +66,11 @@ namespace CoachCalcAPI.Repository
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email.ToString()),
                     new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(20),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -78,6 +78,8 @@ namespace CoachCalcAPI.Repository
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
                 Token = tokenHandler.WriteToken(token),
+                Role = roles.FirstOrDefault(),
+
                 User = _mapper.Map<UserDTO>(user),
 
             };
@@ -88,10 +90,9 @@ namespace CoachCalcAPI.Repository
         {
             ApplicationUser user = new()
             {
-                UserName = registerationRequestDTO.UserName,
-                Email = registerationRequestDTO.UserName,
-                NormalizedEmail = registerationRequestDTO.UserName.ToUpper(),
-                Name = registerationRequestDTO.Name
+                UserName = registerationRequestDTO.Email,
+                Email = registerationRequestDTO.Email,
+                NormalizedEmail = registerationRequestDTO.Email.ToUpper(),
             };
 
             try
@@ -108,7 +109,7 @@ namespace CoachCalcAPI.Repository
                     //await _userManager.AddToRoleAsync(user, "admin");
                     await _userManager.AddToRoleAsync(user, "customer");
                     var userToReturn = _db.ApplicationUsers
-                        .FirstOrDefault(u => u.UserName == registerationRequestDTO.UserName);
+                        .FirstOrDefault(u => u.UserName == registerationRequestDTO.Email);
                     return _mapper.Map<UserDTO>(userToReturn);
                 }
             }

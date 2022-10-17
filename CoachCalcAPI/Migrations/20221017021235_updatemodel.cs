@@ -4,7 +4,7 @@
 
 namespace CoachCalcAPI.Migrations
 {
-    public partial class updateResultModel : Migration
+    public partial class updatemodel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -3,27 +3,32 @@ using CoachCalcAPI.Models;
 using CoachCalcAPI.Models.Dto;
 using CoachCalcAPI.Repository.IRepository;
 using CoachCalcAPI.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace CoachCalcAPI.Controllers
 {
     [Route("api/Exercise")]
     [ApiController]
+    [Authorize(Roles = "admin, customer")]
     public class ExerciseController : ControllerBase
     {
         protected APIResponse _response;
         private ILogger<ExerciseController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IExerciseRepository _dbExercise;
         private readonly IMapper _mapper;
 
-        public ExerciseController(IExerciseRepository dbExercise, ILogger<ExerciseController> logger, IMapper mapper)
+        public ExerciseController(IExerciseRepository dbExercise, ILogger<ExerciseController> logger, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _dbExercise = dbExercise;
             _logger = logger;
             _mapper = mapper;
             this._response = new();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -33,7 +38,8 @@ namespace CoachCalcAPI.Controllers
             try
             {
                 _logger.LogInformation("Getting All exercises");
-                IEnumerable<Exercise> exerciseList = await _dbExercise.GetAllAsync();
+                string userId = _httpContextAccessor.HttpContext.User?.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+                IEnumerable<Exercise> exerciseList = await _dbExercise.GetAllAsync(x=>x.UserId == userId);
                 _response.Result = _mapper.Map<List<ExerciseDTO>>(exerciseList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
