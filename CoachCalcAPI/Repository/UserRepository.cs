@@ -70,7 +70,7 @@ namespace CoachCalcAPI.Repository
                     new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(20),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

@@ -50,20 +50,6 @@ namespace CoachCalcAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exercises",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MetricType = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -193,6 +179,27 @@ namespace CoachCalcAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Exercises",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MetricType = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exercises_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Results",
                 columns: table => new
                 {
@@ -210,12 +217,6 @@ namespace CoachCalcAPI.Migrations
                         name: "FK_Results_Athletees_AthleteeId",
                         column: x => x.AthleteeId,
                         principalTable: "Athletees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Results_Exercises_ExerciseId",
-                        column: x => x.ExerciseId,
-                        principalTable: "Exercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -265,14 +266,14 @@ namespace CoachCalcAPI.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Exercises_UserId",
+                table: "Exercises",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Results_AthleteeId",
                 table: "Results",
                 column: "AthleteeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Results_ExerciseId",
-                table: "Results",
-                column: "ExerciseId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -293,6 +294,9 @@ namespace CoachCalcAPI.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Exercises");
+
+            migrationBuilder.DropTable(
                 name: "Results");
 
             migrationBuilder.DropTable(
@@ -300,9 +304,6 @@ namespace CoachCalcAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Athletees");
-
-            migrationBuilder.DropTable(
-                name: "Exercises");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

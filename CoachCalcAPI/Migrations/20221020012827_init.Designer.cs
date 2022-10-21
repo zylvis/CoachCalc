@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachCalcAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221017021520_exerciseUderId")]
-    partial class exerciseUderId
+    [Migration("20221020012827_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
