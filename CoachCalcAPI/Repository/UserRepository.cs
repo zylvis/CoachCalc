@@ -66,6 +66,7 @@ namespace CoachCalcAPI.Repository
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    new Claim(ClaimTypes.Name, user.Name.ToString()),
                     new Claim(ClaimTypes.Email, user.Email.ToString()),
                     new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
@@ -90,6 +91,7 @@ namespace CoachCalcAPI.Repository
         {
             ApplicationUser user = new()
             {
+                Name = registerationRequestDTO.Name,
                 UserName = registerationRequestDTO.Email,
                 Email = registerationRequestDTO.Email,
                 NormalizedEmail = registerationRequestDTO.Email.ToUpper(),
