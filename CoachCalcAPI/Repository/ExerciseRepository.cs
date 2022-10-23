@@ -50,6 +50,8 @@ namespace CoachCalcAPI.Repository
 
         public async Task RemoveAsync(Exercise entity)
         {
+            IEnumerable<Result> resultsToRemove =  _db.Results.Where(x => x.ExerciseId == entity.Id);
+            _db.Results.RemoveRange(resultsToRemove);
             _db.Exercises.Remove(entity);
             await SaveAsync();
         }

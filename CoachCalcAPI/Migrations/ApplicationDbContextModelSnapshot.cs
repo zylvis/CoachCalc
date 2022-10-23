@@ -137,7 +137,7 @@ namespace CoachCalcAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Athletees");
+                    b.ToTable("Athletees", (string)null);
                 });
 
             modelBuilder.Entity("CoachCalcAPI.Models.Exercise", b =>
@@ -164,7 +164,7 @@ namespace CoachCalcAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Exercises");
+                    b.ToTable("Exercises", (string)null);
                 });
 
             modelBuilder.Entity("CoachCalcAPI.Models.Result", b =>
@@ -193,7 +193,7 @@ namespace CoachCalcAPI.Migrations
 
                     b.HasIndex("AthleteeId");
 
-                    b.ToTable("Results");
+                    b.ToTable("Results", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
