@@ -168,6 +168,13 @@ namespace CoachCalcAPI.Controllers
         {
             try
             {
+                if (await _dbResult.GetAsync(x => x.Date == updateDTO.Date && x.AthleteeId == updateDTO.AthleteeId &&
+                            x.ExerciseId == updateDTO.ExerciseId) != null)
+                {
+                    ModelState.AddModelError("Message", $"Result of the exercise on {updateDTO.Date} already exists!");
+                    return BadRequest(ModelState);
+                }
+
                 if (updateDTO == null || id != updateDTO.Id)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
