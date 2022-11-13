@@ -102,7 +102,7 @@ namespace CoachCalcAPI.Controllers
             try
             {
                 if (await _dbResult.GetAsync(x => x.Date == createDTO.Date && x.AthleteeId == createDTO.AthleteeId &&
-                                            x.ExerciseId == createDTO.ExerciseId) != null)
+                                            x.ExerciseId == createDTO.ExerciseId && x.Value == createDTO.Value) != null)
                 {
                     ModelState.AddModelError("Message", $"Result of the exercise on {createDTO.Date} already exists!");
                     return BadRequest(ModelState);
